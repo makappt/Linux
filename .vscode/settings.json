@@ -3,6 +3,7 @@
     "inlineChat.holdToSpeech": false,
     "editor.tabCompletion": "on",
     "files.associations": {
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "atomic": "cpp"
     }
 }
