@@ -25,7 +25,7 @@ int main(void)
             std::cout << "fd2 open failed\n";
             exit(0);
         }
-        char *str = "hello,world!\n";
+        const char *str = "hello,world!\n";
         write(fd2, str, strlen(str));
     }
     else
