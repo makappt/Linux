@@ -27,6 +27,7 @@ int main(void)
         }
         const char *str = "hello,world!\n";
         write(fd2, str, strlen(str));
+        close(fd2);
     }
     else
     {
@@ -39,6 +40,7 @@ int main(void)
         char buf[1024];
         ssize_t n = read(fd1, &buf, sizeof(buf));
         write(STDOUT_FILENO, buf, n);
+        close(fd1);
         wait(nullptr);
     }
 
