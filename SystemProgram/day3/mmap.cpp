@@ -12,7 +12,6 @@
 #include <cerrno>
 #include <cstring>
 using namespace std;
-
 int main()
 {
     // 创建打开文件
