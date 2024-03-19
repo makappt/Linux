@@ -28,7 +28,7 @@ int main()
         std::cerr << "ftruncate failed: " << std::strerror(errno) << '\n';
         exit(0);
     }
-    // 创建映射区
+    // 创建映射区 映射区的偏移量必须是4k的整数倍，因为4k刚好是一个页面的大小，同理，如果你的映射区大小不足4k的整数倍，也会自动给你分配4k整数倍的最小空间，同时，映射区的大小是由上限的
     void *p = mmap(nullptr, 4, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (p == MAP_FAILED)
     {
