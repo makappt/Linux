@@ -1,5 +1,6 @@
 // 使用pause和alarm实现sleep函数效果，要求实现不会出现失去cpu后永久等待的情况
 // 信号发射时，需要考虑到失去cpu的情况，不然容易出现问题！！！
+// pause函数的危险性，任何信号都能使pause函数停止阻塞，无法解决失去cpu的情况，需要使用sigsuspend函数代替
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
