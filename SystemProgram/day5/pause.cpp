@@ -1,4 +1,5 @@
 // 使用pause和alarm实现sleep函数效果，要求实现不会出现失去cpu后永久等待的情况
+// 信号发射时，需要考虑到失去cpu的情况，不然容易出现问题！！！
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
