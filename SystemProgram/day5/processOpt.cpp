@@ -30,9 +30,8 @@ int main()
     }
     if (pid > 0)
     {
+        sleep(1);
         setpgid(pid, pid);
-        while (waitpid(-1, nullptr, WNOHANG))
-            ;
         while (1)
             ;
     }
