@@ -7,17 +7,12 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cstring> // 为了使用memset
+#include "wrap.h"
 // 接收到的消息转换为大写，然后发送回客户端
 int main()
 {
     struct sockaddr_in server_addr, client_addr;
-    int server_fd = socket(AF_INET, SOCK_STREAM, 0); // 创建socket文件描述符
-
-    if (server_fd == 0)
-    {
-        std::cerr << "Socket creation failed" << std::endl;
-        return -1;
-    }
+    int server_fd = Socket(AF_INET, SOCK_STREAM, 0); // 创建socket文件描述符
 
     // 设置服务器地址结构体
     memset(&server_addr, 0, sizeof(server_addr));    // 清零
@@ -26,30 +21,16 @@ int main()
     server_addr.sin_port = htons(6666);              // 端口6666
 
     // 绑定socket到服务器地址
-    if (bind(server_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
-    {
-        std::cerr << "Bind failed" << std::endl;
-        return -1;
-    }
+    Bind(server_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
 
     // 监听连接
-    if (listen(server_fd, 10) < 0)
-    {
-        std::cerr << "Listen failed" << std::endl;
-        return -1;
-    }
+    Listen(server_fd, 10);
 
     std::cout << "Server is listening on port 6666" << std::endl;
 
     socklen_t client_len = sizeof(client_addr);
     // 接受客户端连接
-    int client_fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_len);
-    if (client_fd < 0)
-    {
-        std::cerr << "Accept failed" << std::endl;
-        return -1;
-    }
-
+    int client_fd = Accept(server_fd, (struct sockaddr *)&client_addr, &client_len);
     char buffer[BUFSIZ]; // BUFSIZ来自<unistd.h>，通常足够大
     int bytes_read;
 

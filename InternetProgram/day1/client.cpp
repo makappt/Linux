@@ -6,35 +6,22 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include "wrap.h"
 // 创建socket，连接到服务器，发送消息，接收服务器回复
 int main()
 {
     struct sockaddr_in serverAddr;
     // 创建socket
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock == -1)
-    {
-        std::cout << "Socket creation failed" << std::endl;
-        return -1;
-    }
+    int sock = Socket(AF_INET, SOCK_STREAM, 0);
 
     // 设置服务器地址
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(6666); // 服务器监听的端口
     // 将点分十进制的IP地址转换为用于网络通信的数值格式
-    if (inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr) <= 0)
-    {
-        std::cout << "Invalid address/ Address not supported" << std::endl;
-        return -1;
-    }
+    Inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr);
 
     // 连接到服务器
-    if (connect(sock, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0)
-    {
-        std::cout << "Connection Failed" << std::endl;
-        return -1;
-    }
-
+    Connect(sock, (struct sockaddr *)&serverAddr, sizeof(serverAddr));
     std::cout << "Connected to the server." << std::endl;
 
     // 发送数据

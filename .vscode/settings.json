@@ -2,6 +2,8 @@
     "accessibility.verbosity.inlineChat": false,
     "inlineChat.holdToSpeech": false,
     "editor.tabCompletion": "on",
+    "editor.cursorStyle": "block",
+    "editor.cursorBlinking": "blink",
     "files.associations": {
         "iostream": "cpp",
         "atomic": "cpp",
@@ -59,6 +61,9 @@
         "span": "cpp",
         "sstream": "cpp",
         "cinttypes": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "bitset": "cpp",
+        "regex": "cpp",
+        "buffer": "cpp"
     }
 }
