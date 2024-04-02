@@ -68,6 +68,14 @@ int Inet_pton(int af, const char *src, in_addr *dst)
     return ret;
 }
 
+/**
+ * @brief Reads data from a file descriptor.
+ *
+ * @param fd The file descriptor to read from.
+ * @param ptr A pointer to the buffer where the read data will be stored.
+ * @param nbytes The number of bytes to read.
+ * @return ssize_t The number of bytes read on success, -1 on failure.
+ */
 ssize_t Read(int fd, void *ptr, size_t nbytes)
 {
     ssize_t n;
@@ -82,6 +90,14 @@ again:
     return n;
 }
 
+/**
+ * Writes data to a file descriptor.
+ *
+ * @param fd The file descriptor to write to.
+ * @param ptr A pointer to the data to be written.
+ * @param nbytes The number of bytes to write.
+ * @return On success, the number of bytes written is returned. On error, -1 is returned.
+ */
 ssize_t Write(int fd, const void *ptr, size_t nbytes)
 {
     ssize_t n;
@@ -104,6 +120,17 @@ int Close(int fd)
     return ret;
 }
 
+/**
+ * @brief Reads data from a file descriptor into a buffer.
+ *
+ * This function reads up to 'n' bytes from the file descriptor 'fd' into the buffer pointed to by 'vptr'.
+ * It continues reading until 'n' bytes have been read or an error occurs.
+ *
+ * @param fd The file descriptor to read from.
+ * @param vptr The pointer to the buffer where the data will be stored.
+ * @param n The maximum number of bytes to read.
+ * @return The total number of bytes read, or -1 if an error occurs.
+ */
 ssize_t Readn(int fd, void *vptr, size_t n)
 {
     size_t nleft;
@@ -130,6 +157,14 @@ ssize_t Readn(int fd, void *vptr, size_t n)
     return n - nleft;
 }
 
+/**
+ * Writes data to a file descriptor.
+ *
+ * @param fd The file descriptor to write to.
+ * @param vptr A pointer to the data to be written.
+ * @param n The number of bytes to write.
+ * @return The number of bytes written on success, or -1 on failure.
+ */
 ssize_t Writen(int fd, const void *vptr, size_t n)
 {
     size_t nleft;
@@ -154,6 +189,15 @@ ssize_t Writen(int fd, const void *vptr, size_t n)
     return n;
 }
 
+/**
+ * @brief Reads a single character from a file descriptor.
+ *
+ * This function reads a single character from the file descriptor specified by `fd` and stores it in the memory location pointed to by `ptr`.
+ *
+ * @param fd The file descriptor to read from.
+ * @param ptr A pointer to the memory location where the read character will be stored.
+ * @return On success, returns 1. If the end of the file is reached, returns 0. If an error occurs, returns -1.
+ */
 ssize_t my_read(int fd, char *ptr)
 {
     static int read_cnt;
@@ -178,6 +222,17 @@ ssize_t my_read(int fd, char *ptr)
     return 1;
 }
 
+/**
+ * @brief Reads a line from a file descriptor.
+ *
+ * This function reads a line from the specified file descriptor and stores it in the provided buffer.
+ * The maximum number of characters to read is specified by the maxlen parameter.
+ *
+ * @param fd The file descriptor to read from.
+ * @param vptr The buffer to store the read line.
+ * @param maxlen The maximum number of characters to read.
+ * @return The number of characters read, or -1 if an error occurred.
+ */
 ssize_t Readline(int fd, void *vptr, size_t maxlen)
 {
     ssize_t n, rc;
