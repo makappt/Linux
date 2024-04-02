@@ -3,11 +3,11 @@ obj = $(patsubst %.cpp, %.o, $(src))
 
 all: server client
 
-server: mult_process_server.o wrap.o
-	g++ mult_process_server.o wrap.o -o server -Wall
+server: mult_thread_server.o wrap.o
+	g++ mult_thread_server.o wrap.o -o server -Wall
 
-client: mult_process_client.o wrap.o
-	g++ mult_process_client.o wrap.o -o client -Wall
+client: mult_thread_client.o wrap.o
+	g++ mult_thread_client.o wrap.o -o client -Wall
 
 %.o: %.cpp
 	g++ -c $< -Wall
