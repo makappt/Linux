@@ -9,9 +9,9 @@ int main()
     struct sockaddr_in server_addr;
 
     bzero(&server_addr, sizeof(server_addr));
-    server_fd = Socket(AF_INET, SOCK_STREAM, 0);
+    server_fd              = Socket(AF_INET, SOCK_STREAM, 0);
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(8888);
+    server_addr.sin_port   = htons(8888);
     Inet_pton(AF_INET, IPSERVER, &server_addr.sin_addr);
     Connect(server_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
     char buf[BUFSIZ];

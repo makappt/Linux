@@ -1,51 +1,44 @@
 #include "wrap.h"
-#include <cstdio>
 #include <cerrno>
+#include <cstdio>
 
-void perr_exit(const char *str)
-{
+void perr_exit(const char* str) {
     perror(str);
     exit(-1);
 }
 
-int Socket(int domain, int type, int protocol)
-{
+int Socket(int domain, int type, int protocol) {
     int fd = socket(domain, type, protocol);
     if (fd == -1)
         perr_exit("socket failed: ");
     return fd;
 }
 
-int Bind(int sockfd, const sockaddr *addr, socklen_t addrlen)
-{
+int Bind(int sockfd, const sockaddr* addr, socklen_t addrlen) {
     int ret = bind(sockfd, addr, addrlen);
     if (ret == -1)
         perr_exit("bind failed: ");
     return ret;
 }
 
-int Listen(int sockfd, int backlog)
-{
+int Listen(int sockfd, int backlog) {
     int ret = listen(sockfd, backlog);
     if (ret == -1)
         perr_exit("listen failed: ");
     return ret;
 }
 
-int Connect(int sockfd, const sockaddr *addr, socklen_t addrlen)
-{
+int Connect(int sockfd, const sockaddr* addr, socklen_t addrlen) {
     int ret = connect(sockfd, addr, addrlen);
     if (ret == -1)
         perr_exit("connect failed: ");
     return ret;
 }
 
-int Accept(int sockfd, sockaddr *addr, socklen_t *addrlen)
-{
+int Accept(int sockfd, sockaddr* addr, socklen_t* addrlen) {
     int ret = accept(sockfd, addr, addrlen);
 again:
-    if (ret < 0)
-    {
+    if (ret < 0) {
         if ((errno == ECONNABORTED) || (errno == EINTR))
             goto again;
         else
@@ -54,8 +47,7 @@ again:
     return ret;
 }
 
-int Inet_pton(int af, const char *src, in_addr *dst)
-{
+int Inet_pton(int af, const char* src, in_addr* dst) {
     int ret = inet_pton(af, src, dst);
     if (ret == 0 || ret == -1)
         perr_exit("inet_pton failed: ");
@@ -70,13 +62,11 @@ int Inet_pton(int af, const char *src, in_addr *dst)
  * @param nbytes The number of bytes to read.
  * @return ssize_t The number of bytes read on success, -1 on failure.
  */
-ssize_t Read(int fd, void *ptr, size_t nbytes)
-{
+ssize_t Read(int fd, void* ptr, size_t nbytes) {
     ssize_t n;
 again:
     // read 只有读到0时才会结束
-    if ((n = read(fd, ptr, nbytes)) == -1)
-    {
+    if ((n = read(fd, ptr, nbytes)) == -1) {
         if (errno == EINTR)
             goto again;
         else
@@ -93,12 +83,10 @@ again:
  * @param nbytes The number of bytes to write.
  * @return On success, the number of bytes written is returned. On error, -1 is returned.
  */
-ssize_t Write(int fd, const void *ptr, size_t nbytes)
-{
+ssize_t Write(int fd, const void* ptr, size_t nbytes) {
     ssize_t n;
 again:
-    if ((n = write(fd, ptr, nbytes)) == -1)
-    {
+    if ((n = write(fd, ptr, nbytes)) == -1) {
         if (errno == EINTR)
             goto again;
         else
@@ -107,8 +95,7 @@ again:
     return n;
 }
 
-int Close(int fd)
-{
+int Close(int fd) {
     int ret = close(fd);
     if (ret == -1)
         perr_exit("close error");
@@ -126,25 +113,21 @@ int Close(int fd)
  * @param n The maximum number of bytes to read.
  * @return The total number of bytes read, or -1 if an error occurs.
  */
-ssize_t Readn(int fd, void *vptr, size_t n)
-{
-    size_t nleft;  // 还剩多少没有读
-    ssize_t nread; // 实际读到的字节数
-    char *ptr;
+ssize_t Readn(int fd, void* vptr, size_t n) {
+    size_t nleft;   // 还剩多少没有读
+    ssize_t nread;  // 实际读到的字节数
+    char* ptr;
 
-    ptr = (char *)vptr;
-    nleft = n; // 未读取字节数
+    ptr = (char*)vptr;
+    nleft = n;  // 未读取字节数
 
-    while (nleft > 0)
-    {
-        if ((nread = read(fd, ptr, nleft)) < 0)
-        {
+    while (nleft > 0) {
+        if ((nread = read(fd, ptr, nleft)) < 0) {
             if (errno == EINTR)
                 nread = 0;
             else
                 return -1;
-        }
-        else if (nread == 0)
+        } else if (nread == 0)
             break;
         nleft -= nread;
         ptr += nread;
@@ -160,19 +143,16 @@ ssize_t Readn(int fd, void *vptr, size_t n)
  * @param n The number of bytes to write.
  * @return The number of bytes written on success, or -1 on failure.
  */
-ssize_t Writen(int fd, const void *vptr, size_t n)
-{
+ssize_t Writen(int fd, const void* vptr, size_t n) {
     size_t nleft;
     ssize_t nwritten;
-    const char *ptr;
+    const char* ptr;
 
-    ptr = (char *)vptr;
+    ptr = (char*)vptr;
     nleft = n;
 
-    while (nleft > 0)
-    {
-        if ((nwritten = write(fd, ptr, nleft)) <= 0)
-        {
+    while (nleft > 0) {
+        if ((nwritten = write(fd, ptr, nleft)) <= 0) {
             if (nwritten < 0 && errno == EINTR)
                 nwritten = 0;
             else
@@ -193,22 +173,18 @@ ssize_t Writen(int fd, const void *vptr, size_t n)
  * @param ptr A pointer to the memory location where the read character will be stored.
  * @return On success, returns 1. If the end of the file is reached, returns 0. If an error occurs, returns -1.
  */
-ssize_t my_read(int fd, char *ptr)
-{
+ssize_t my_read(int fd, char* ptr) {
     static int read_cnt;
-    static char *read_ptr;
+    static char* read_ptr;
     static char read_buf[100];
 
-    if (read_cnt <= 0)
-    {
+    if (read_cnt <= 0) {
     again:
-        if ((read_cnt = read(fd, read_buf, sizeof(read_buf))) < 0)
-        {
+        if ((read_cnt = read(fd, read_buf, sizeof(read_buf))) < 0) {
             if (errno == EINTR)
                 goto again;
             return -1;
-        }
-        else if (read_cnt == 0)
+        } else if (read_cnt == 0)
             return 0;
         read_ptr = read_buf;
     }
@@ -228,26 +204,20 @@ ssize_t my_read(int fd, char *ptr)
  * @param maxlen The maximum number of characters to read.
  * @return The number of characters read, or -1 if an error occurred.
  */
-ssize_t Readline(int fd, void *vptr, size_t maxlen)
-{
+ssize_t Readline(int fd, void* vptr, size_t maxlen) {
     ssize_t n, rc;
     char c, *ptr;
-    ptr = (char *)vptr;
+    ptr = (char*)vptr;
 
-    for (n = 1; n < maxlen; n++)
-    {
-        if ((rc = my_read(fd, &c)) == 1)
-        {
+    for (n = 1; n < maxlen; n++) {
+        if ((rc = my_read(fd, &c)) == 1) {
             *ptr++ = c;
             if (c == '\n')
                 break;
-        }
-        else if (rc == 0)
-        {
+        } else if (rc == 0) {
             *ptr = 0;
             return n - 1;
-        }
-        else
+        } else
             return -1;
     }
     *ptr = 0;

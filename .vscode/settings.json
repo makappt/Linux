@@ -64,6 +64,10 @@
         "variant": "cpp",
         "bitset": "cpp",
         "regex": "cpp",
-        "buffer": "cpp"
-    }
+        "buffer": "cpp",
+        "io_context": "cpp"
+    },
+    "window.zoomLevel": -1,
+    "cmake.configureArgs": [],
+    "editor.formatOnSave": true
 }

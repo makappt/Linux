@@ -32,8 +32,11 @@ int main()
     char buf[BUFSIZ];
     while (true)
     {
-        int client_fd = Accept(sfd, (struct sockaddr *)&client_addr, &client_length);
-        printf("client ip: %s, port: %d\n", inet_ntop(AF_INET, &client_addr.sin_addr, buf, sizeof(buf)), ntohs(client_addr.sin_port));
+        int client_fd =
+            Accept(sfd, (struct sockaddr *)&client_addr, &client_length);
+        printf("client ip: %s, port: %d\n",
+               inet_ntop(AF_INET, &client_addr.sin_addr, buf, sizeof(buf)),
+               ntohs(client_addr.sin_port));
 
         pid = fork();
         if (pid == 0)
