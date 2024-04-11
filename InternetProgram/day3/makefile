@@ -1,9 +1,9 @@
 src = $(wildcard *.cpp)
 obj = $(patsubst %.cpp, %.o, $(src))
 
-all: server
+all: poll
 
-server: select.o wrap.o
+server: poll.o wrap.o
 	g++ select.o wrap.o -o server -Wall
 
 # client: mult_thread_client.o wrap.o

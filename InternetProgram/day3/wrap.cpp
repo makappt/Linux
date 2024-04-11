@@ -20,7 +20,6 @@ int Bind(int sockfd, const sockaddr* addr, socklen_t addrlen) {
         perr_exit("bind failed: ");
     return ret;
 }
-
 int Listen(int sockfd, int backlog) {
     int ret = listen(sockfd, backlog);
     if (ret == -1)

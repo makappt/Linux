@@ -1,97 +1,79 @@
+/* select实现多路IO转接 */
+#include <algorithm>
 #include <iostream>
 #include "wrap.h"
 
-using namespace std;
+#define IPSERVER "127.0.0.1"
+#define PORT 6666
 
 int main() {
-    int maxi, i, j, maxfd, nready, size;
-    int listenfd, client[FD_SETSIZE], clientfd, sockfd;
+    /* Create a client[] array to make up for the problem of selecting looping 1024 times each time */
+    int clientfd, client[FD_SETSIZE], listenfd, maxi, maxfd;
     char buf[BUFSIZ], str[INET_ADDRSTRLEN];
-    struct sockaddr_in clientAddr, serverAddr;
-    socklen_t clientAddr_len;
+    struct sockaddr_in serverAddr, clientAddr;
+    socklen_t clientAddrLen;
     fd_set rset, allset;
 
     listenfd = Socket(AF_INET, SOCK_STREAM, 0);
-
-    // 实现端口复用
     int opt = 1;
     setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
     bzero(&serverAddr, sizeof(serverAddr));
-    serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    /*nihao*/
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(6666);
+    Inet_pton(AF_INET, IPSERVER, &serverAddr.sin_addr);
+    serverAddr.sin_port = htons(PORT);
     Bind(listenfd, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
 
     Listen(listenfd, 128);
 
-    maxfd = listenfd;
-    maxi = -1;
-    for (i = 0; i < FD_SETSIZE; i++) {
-        client[i] = -1;
-    }
-
     FD_ZERO(&allset);
     FD_SET(listenfd, &allset);
-    while (true) {
-        /* 虽然有很多描述符，但并不是每一个都有效 */
-        rset = allset;
-        /* rset是传入传出参数 开始监听 */
-        nready = select(maxfd + 1, &rset, nullptr, nullptr, nullptr);
-        if (nready < 0)
-            perr_exit("select error");
-        /* 使用监听描述符监听是否有新的客户端链接请求 */
-        if (FD_ISSET(listenfd, &rset)) {
-            clientAddr_len = sizeof(clientAddr);
-            clientfd =
-                Accept(listenfd, (struct sockaddr*)&clientAddr, &clientAddr_len);
+    maxfd = listenfd;
+    maxi = -1;
 
-            printf("received from %s at PORT %d\n",
-                   inet_ntop(AF_INET, &clientAddr.sin_addr, str, sizeof(str)),
-                   ntohs(clientAddr.sin_port));
+    for (int i = 0; i < FD_SETSIZE; i++) {
+        client[i] = -1;
+    }
+    int count;
+    clientAddrLen = sizeof(clientAddr);
+    while (true) {
+        rset = allset;
+        count = select(maxfd + 1, &rset, nullptr, nullptr, nullptr);
+        if (FD_ISSET(listenfd, &rset)) {
+            int i;
+            clientfd = Accept(listenfd, (struct sockaddr*)&clientAddr, &clientAddrLen);
             for (i = 0; i < FD_SETSIZE; i++) {
                 if (client[i] < 0) {
                     client[i] = clientfd;
                     break;
                 }
             }
+            if (maxi == FD_SETSIZE) {
+                perr_exit("文件描述符已满");
+                continue;
+            }
+            maxi = std::max(i, maxi);
+            maxfd = std::max(clientfd, maxfd);
 
-            if (i == FD_SETSIZE) {
-                fputs("too many clients\n",
-                      stderr);  // 达到select能监控的文件个数上限 1024
-                exit(1);
-            }
-            FD_SET(clientfd, &allset);  // 添加新连接到allset中
-            if (clientfd > maxfd) {
-                maxfd = clientfd;
-            }
-            if (i > maxi) {
-                maxi = i;
-            }
-            if (--nready == 0) {
+            FD_SET(clientfd, &allset);
+            if (count == 1)
                 continue;
-            }
         }
-        for (i = 0; i <= maxi; i++) {
-            if ((sockfd = client[i]) < 0)
-                continue;
-            if (FD_ISSET(sockfd, &rset)) {
-                size = Read(sockfd, buf, sizeof(buf));
-                if (size == 0) {
-                    Close(sockfd);
-                    FD_CLR(sockfd, &allset);
+        for (int i = 0; i <= maxi; i++) {
+            if (FD_ISSET(client[i], &rset)) {
+                int n = Read(client[i], buf, BUFSIZ);
+                if (n == 0) {
+                    Close(client[i]);
+                    FD_CLR(client[i], &allset);
                     client[i] = -1;
-                } else {
-                    Write(STDOUT_FILENO, buf, size);
-                    for (j = 0; j < size; j++)
-                        buf[j] = toupper(buf[j]);
-                    Write(sockfd, buf, size);
                 }
-                if (--nready == 0)
-                    break;
+                Write(STDOUT_FILENO, buf, n);
+                for (int j = 0; j < n; ++j) {
+                    buf[j] = toupper(buf[j]);
+                }
+                Write(client[i], buf, n);
             }
         }
     }
-    Close(listenfd);
     return 0;
 }
